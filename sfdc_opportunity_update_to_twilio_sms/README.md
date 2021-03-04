@@ -42,12 +42,12 @@ the defined fields in opportunity SObject will be sent.
 
 ## Configuration
 
-### Setup Salesforce Configurations
+### Setup Salesforce configurations
 * Create a Salesforce account and create a connected app by visiting [Salesforce](https://www.salesforce.com). 
 * Salesforce username, password will be needed for initializing the listener. 
 * Once you obtained all configurations, Replace "" in the `Conf.toml` file with your data.
 
-### Create Push Topic in Salesforce developer console
+### Create push topic in Salesforce developer console
 
 The Salesforce trigger requires topics to be created for each event. We need to configure topic to listen on Custom Object entity.
 
@@ -64,7 +64,7 @@ insert pushTopic;
 ```
 3. Once the creation is done, specify the topic name in your `Config.toml` file as `sf_push_topic`.
 
-### Setup Twilio Configurations
+### Setup Twilio configurations
 Create a [Twilio developer account](https://www.twilio.com/). 
 
 1. Create a Twilio project with SMS capabilities.
@@ -89,7 +89,7 @@ auth_token = ""
 from_mobile = ""
 to_mobile = ""
 
-## Running the Template
+## Running the template
 
 1. First you need to build the integration template and create the executable binary. Run the following command from the root directory of the integration template. 
 `$ bal build`. 
