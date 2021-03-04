@@ -43,7 +43,6 @@ service on sfdcEventListener {
                     if(opportunityId is json) {
                         json|error opportunityObject = opportunityInfo.sobject;
                         if(opportunityObject is json) {
-                            log:print(opportunityObject.toString());
                             sendMessageWithOpportunityUpdate(opportunityObject);
                         } else {
                             log:printError(opportunityObject.message());
@@ -63,30 +62,10 @@ service on sfdcEventListener {
 
 function sendMessageWithOpportunityUpdate(json opportunity) {
     var result = twilioClient->sendSms(from_mobile, to_mobile, opportunity.toString());
-    if (result is error) {
-        log:printError(result.message());
+    if (result is twilio:SmsResponse) {
+        log:print("SMS sent successfully for the opportunity update || " + "SMS_SID: " + result.sid.toString() + 
+            "|| Body: " + result.body.toString());
     } else {
-        log:print("SMS sent successfully for the opportunity update");
+        log:printError(result.message());
     }
 }
-
-// function createSheetWithNewLead(json lead) returns @tainted error? {
-//     (int|string|float)[] values = [];
-//     (string)[] headerValues = [];
-//     map<json> leadMap = <map<json>>lead;
-//     foreach var [key, value] in leadMap.entries() {
-//         headerValues.push(key.toString());
-//         values.push(value.toString());
-//     }
-//     // var headers = gSheetClient->getRow(sheets_id, sheets_name, 1);
-//     // if(headers == []){
-//     //     _ = check gSheetClient->appendRowToSheet(sheets_id, sheets_name, headerValues);
-//     // }
-//     // _ = check gSheetClient->appendRowToSheet(sheets_id, sheets_name, values);
-//     var result = twilioClient->sendSms(from_mobile, to_mobile, messageContent);
-//     if (result is error) {
-//         log:printError("Error Occured : ", err = result);
-//     } else {
-//         log:print("Message sent successfully");
-//     }
-// }
