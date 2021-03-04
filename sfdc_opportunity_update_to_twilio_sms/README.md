@@ -77,17 +77,17 @@ Create a [Twilio developer account](https://www.twilio.com/).
 
 #### ballerinax/sfdc related configurations 
 
-sf_username = ""
-sf_password = ""
-sf_push_topic = "";
+sf_username = ""  
+sf_password = ""  
+sf_push_topic = ""  
 
 
 #### ballerinax/twilio related configurations  
 
-account_sid = ""
-auth_token = ""
+account_sid = ""  
+auth_token = ""  
 from_mobile = ""
-to_mobile = ""
+to_mobile = ""  
 
 ## Running the template
 
