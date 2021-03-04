@@ -86,8 +86,8 @@ sf_push_topic = ""
 
 account_sid = ""  
 auth_token = ""  
-from_mobile = ""
-to_mobile = ""  
+from_mobile = ""  
+to_mobile = ""    
 
 ## Running the template
 
