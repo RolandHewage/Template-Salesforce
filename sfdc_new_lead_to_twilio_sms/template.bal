@@ -61,10 +61,18 @@ service on sfdcEventListener {
 }
 
 function sendMessageForNewLead(json lead) {
-    var result = twilioClient->sendSms(from_mobile, to_mobile, lead.toString());
+    string message = "New Salesforce lead created successfully! \n";
+    map<json> leadMap = <map<json>> lead;
+    foreach var [key, value] in leadMap.entries() {
+        if(value != ()) {
+            message = message + key + " : " + value.toString() + "\n";
+        }
+    }
+
+    var result = twilioClient->sendSms(from_mobile, to_mobile, message);
     if (result is twilio:SmsResponse) {
-        log:print("SMS sent successfully for the lead update || " + "SMS_SID: " + result.sid.toString() + 
-            "|| Body: " + result.body.toString());
+        log:print("SMS sent successfully for the new Salesforce lead created" + "\nSMS_SID: " + result.sid.toString() + 
+            "\nSMS Body: \n" + result.body.toString());
     } else {
         log:printError(result.message());
     }
