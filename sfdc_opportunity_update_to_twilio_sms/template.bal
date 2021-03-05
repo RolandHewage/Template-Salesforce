@@ -61,10 +61,18 @@ service on sfdcEventListener {
 }
 
 function sendMessageWithOpportunityUpdate(json opportunity) {
-    var result = twilioClient->sendSms(from_mobile, to_mobile, opportunity.toString());
+    string message = "Salesforce opportunity updated successfully! \n";
+    map<json> opportunityMap = <map<json>> opportunity;
+    foreach var [key, value] in opportunityMap.entries() {
+        if(value != ()) {
+            message = message + key + " : " + value.toString() + "\n";
+        }
+    }
+
+    var result = twilioClient->sendSms(from_mobile, to_mobile, message);
     if (result is twilio:SmsResponse) {
-        log:print("SMS sent successfully for the opportunity update || " + "SMS_SID: " + result.sid.toString() + 
-            "|| Body: " + result.body.toString());
+        log:print("SMS sent successfully for the Salesforce opportunity update" + "\nSMS_SID: " + result.sid.toString() + 
+            "\nSMS Body: \n" + result.body.toString());
     } else {
         log:printError(result.message());
     }
