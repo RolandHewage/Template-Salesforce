@@ -35,14 +35,14 @@ service on sfdcEventListener {
     remote function onEvent(json opportunity) {
         io:StringReader sr = new (opportunity.toJsonString());
         json|error opportunityInfo = sr.readJson();
-        if(opportunityInfo is json) {   
+        if (opportunityInfo is json) {   
             json|error eventType = opportunityInfo.event.'type;        
-            if(eventType is json) {
-                if(TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
+            if (eventType is json) {
+                if (TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
                     json|error opportunityId = opportunityInfo.sobject.Id;
-                    if(opportunityId is json) {
+                    if (opportunityId is json) {
                         json|error opportunityObject = opportunityInfo.sobject;
-                        if(opportunityObject is json) {
+                        if (opportunityObject is json) {
                             sendMessageWithOpportunityUpdate(opportunityObject);
                         } else {
                             log:printError(opportunityObject.message());
