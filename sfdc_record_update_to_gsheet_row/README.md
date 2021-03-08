@@ -1,7 +1,7 @@
 # Update a row in Google sheets when a record is updated in Salesforce
 
 ## Intergration use case
-At the execution of this template, each time a record is updated in salesforce, Google Sheets Spreadsheet row will be updated containing all the defined fields of particular SObject. Users need to provide the name of the SObject they wish to log into the GSheet as a configuration parameter (`sf_object`) prior to the execution.
+At the execution of this template, each time a record is updated in salesforce, Google Sheets Spreadsheet row will be updated containing all the defined fields of particular SObject. 
 
 ## Supported versions
 
