@@ -35,14 +35,14 @@ service on sfdcEventListener {
     remote function onEvent(json lead) {
         io:StringReader sr = new (lead.toJsonString());
         json|error leadInfo = sr.readJson();
-        if(leadInfo is json) {   
+        if (leadInfo is json) {   
             json|error eventType = leadInfo.event.'type;        
-            if(eventType is json) {
-                if(TYPE_CREATED.equalsIgnoreCaseAscii(eventType.toString())) {
+            if (eventType is json) {
+                if (TYPE_CREATED.equalsIgnoreCaseAscii(eventType.toString())) {
                     json|error leadId = leadInfo.sobject.Id;
-                    if(leadId is json) {
+                    if (leadId is json) {
                         json|error leadObject = leadInfo.sobject;
-                        if(leadObject is json) {
+                        if (leadObject is json) {
                             sendMessageForNewLead(leadObject);
                         } else {
                             log:printError(leadObject.message());
@@ -64,7 +64,7 @@ function sendMessageForNewLead(json lead) {
     string message = "New Salesforce lead created successfully! \n";
     map<json> leadMap = <map<json>> lead;
     foreach var [key, value] in leadMap.entries() {
-        if(value != ()) {
+        if (value != ()) {
             message = message + key + " : " + value.toString() + "\n";
         }
     }
