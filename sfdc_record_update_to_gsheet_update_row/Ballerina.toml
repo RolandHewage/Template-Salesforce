@@ -1,6 +1,6 @@
 [package]
 org = "roland"
-name = "sfdc_record_update_to_gsheet_row"
+name = "sfdc_record_update_to_gsheet_update_row"
 version = "0.1.0"
 
 [build-options]
