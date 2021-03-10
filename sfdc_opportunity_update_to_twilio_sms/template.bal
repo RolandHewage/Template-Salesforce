@@ -1,4 +1,4 @@
-import ballerina/log;
+// import ballerina/log;
 import ballerina/io;
 import ballerinax/sfdc;
 import ballerinax/twilio;
@@ -32,35 +32,19 @@ listener sfdc:Listener sfdcEventListener = new (listenerConfig);
     topic: TOPIC_PREFIX + sf_push_topic
 }
 service on sfdcEventListener {
-    remote function onEvent(json opportunity) {
+    remote function onEvent(json opportunity) returns error? {
         io:StringReader sr = new (opportunity.toJsonString());
-        json|error opportunityInfo = sr.readJson();
-        if (opportunityInfo is json) {   
-            json|error eventType = opportunityInfo.event.'type;        
-            if (eventType is json) {
-                if (TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
-                    json|error opportunityId = opportunityInfo.sobject.Id;
-                    if (opportunityId is json) {
-                        json|error opportunityObject = opportunityInfo.sobject;
-                        if (opportunityObject is json) {
-                            sendMessageWithOpportunityUpdate(opportunityObject);
-                        } else {
-                            log:printError(opportunityObject.message());
-                        }
-                    } else {
-                        log:printError(opportunityId.message());
-                    }
-                }
-            } else {
-                log:printError(eventType.message());
-            }
-        } else {
-            log:printError(opportunityInfo.message());
-        }
+        json opportunityInfo = check sr.readJson();        
+        json eventType = check opportunityInfo.event.'type;                
+        if (TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
+            json opportunityId = check opportunityInfo.sobject.Id;            
+            json opportunityObject = check opportunityInfo.sobject;            
+            check sendMessageWithOpportunityUpdate(opportunityObject);            
+        }        
     }
 }
 
-function sendMessageWithOpportunityUpdate(json opportunity) {
+function sendMessageWithOpportunityUpdate(json opportunity) returns error? {
     string message = "Salesforce opportunity updated successfully! \n";
     map<json> opportunityMap = <map<json>> opportunity;
     foreach var [key, value] in opportunityMap.entries() {
@@ -68,12 +52,5 @@ function sendMessageWithOpportunityUpdate(json opportunity) {
             message = message + key + " : " + value.toString() + "\n";
         }
     }
-
-    var result = twilioClient->sendSms(from_mobile, to_mobile, message);
-    if (result is twilio:SmsResponse) {
-        log:print("SMS sent successfully for the Salesforce opportunity update" + "\nSMS_SID: " + result.sid.toString() + 
-            "\nSMS Body: \n" + result.body.toString());
-    } else {
-        log:printError(result.message());
-    }
+    twilio:SmsResponse result = check twilioClient->sendSms(from_mobile, to_mobile, message);
 }

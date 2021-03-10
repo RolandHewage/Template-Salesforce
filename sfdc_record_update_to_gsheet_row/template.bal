@@ -39,31 +39,15 @@ listener sfdc:Listener sfdcEventListener = new (listenerConfig);
     topic: TOPIC_PREFIX + sf_push_topic
 }
 service on sfdcEventListener {
-    remote function onEvent(json sObject) {
+    remote function onEvent(json sObject) returns error? {
         io:StringReader sr = new (sObject.toJsonString());
-        json|error sObjectInfo = sr.readJson();
-        if (sObjectInfo is json) {   
-            json|error eventType = sObjectInfo.event.'type;        
-            if (eventType is json) {
-                if (TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
-                    json|error sObjectId = sObjectInfo.sobject.Id;
-                    if (sObjectId is json) {
-                        json|error sObjectObject = sObjectInfo.sobject;
-                        if (sObjectObject is json) {
-                            checkpanic updateSheetWithUpdatedRecord(sObjectObject);
-                        } else {
-                            log:printError(sObjectObject.message());
-                        }
-                    } else {
-                        log:printError(sObjectId.message());
-                    }
-                }
-            } else {
-                log:printError(eventType.message());
-            }
-        } else {
-            log:printError(sObjectInfo.message());
-        }
+        json sObjectInfo = check sr.readJson();         
+        json eventType = check sObjectInfo.event.'type;               
+        if (TYPE_UPDATED.equalsIgnoreCaseAscii(eventType.toString())) {
+            json sObjectId = check sObjectInfo.sobject.Id;            
+            json sObjectObject = check sObjectInfo.sobject;
+            check updateSheetWithUpdatedRecord(sObjectObject);            
+        }        
     }
 }
 
@@ -79,7 +63,6 @@ function updateSheetWithUpdatedRecord(json sObject) returns @tainted error? {
     int updatedRow = 0;
     int columnCounter = 0;
     int rowCounter = 1;
-
 
     map<json> sObjectMap = <map<json>>sObject;
     foreach var [key, value] in sObjectMap.entries() {

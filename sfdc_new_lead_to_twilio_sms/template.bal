@@ -1,4 +1,4 @@
-import ballerina/log;
+// import ballerina/log;
 import ballerina/io;
 import ballerinax/sfdc;
 import ballerinax/twilio;
@@ -32,35 +32,19 @@ listener sfdc:Listener sfdcEventListener = new (listenerConfig);
     topic: TOPIC_PREFIX + sf_push_topic
 }
 service on sfdcEventListener {
-    remote function onEvent(json lead) {
+    remote function onEvent(json lead) returns error? {
         io:StringReader sr = new (lead.toJsonString());
-        json|error leadInfo = sr.readJson();
-        if (leadInfo is json) {   
-            json|error eventType = leadInfo.event.'type;        
-            if (eventType is json) {
-                if (TYPE_CREATED.equalsIgnoreCaseAscii(eventType.toString())) {
-                    json|error leadId = leadInfo.sobject.Id;
-                    if (leadId is json) {
-                        json|error leadObject = leadInfo.sobject;
-                        if (leadObject is json) {
-                            sendMessageForNewLead(leadObject);
-                        } else {
-                            log:printError(leadObject.message());
-                        }
-                    } else {
-                        log:printError(leadId.message());
-                    }
-                }
-            } else {
-                log:printError(eventType.message());
-            }
-        } else {
-            log:printError(leadInfo.message());
-        }
+        json leadInfo = check sr.readJson();         
+        json eventType = check leadInfo.event.'type;               
+        if (TYPE_CREATED.equalsIgnoreCaseAscii(eventType.toString())) {
+            json leadId = check leadInfo.sobject.Id;
+            json leadObject = check leadInfo.sobject;
+            check sendMessageForNewLead(leadObject);
+        }     
     }
 }
 
-function sendMessageForNewLead(json lead) {
+function sendMessageForNewLead(json lead) returns error? {
     string message = "New Salesforce lead created successfully! \n";
     map<json> leadMap = <map<json>> lead;
     foreach var [key, value] in leadMap.entries() {
@@ -69,11 +53,5 @@ function sendMessageForNewLead(json lead) {
         }
     }
 
-    var result = twilioClient->sendSms(from_mobile, to_mobile, message);
-    if (result is twilio:SmsResponse) {
-        log:print("SMS sent successfully for the new Salesforce lead created" + "\nSMS_SID: " + result.sid.toString() + 
-            "\nSMS Body: \n" + result.body.toString());
-    } else {
-        log:printError(result.message());
-    }
+    twilio:SmsResponse result = check twilioClient->sendSms(from_mobile, to_mobile, message);
 }
