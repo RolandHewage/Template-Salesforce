@@ -1,38 +1,26 @@
 import ballerina/log;
 import ballerina/io;
+import ballerina/http;
 import ballerinax/sfdc;
 import ballerinax/googleapis_sheets as sheets;
 
-// Google sheet configuration parameters
-configurable string sheets_refreshToken = ?;
-configurable string sheets_clientId = ?;
-configurable string sheets_clientSecret = ?;
-configurable string sheets_spreadsheet_id = ?;
-configurable string sheets_worksheet_name = ?;
+// google sheet configuration parameters
+configurable http:OAuth2DirectTokenConfig & readonly directTokenConfig = ?;
+configurable string & readonly sheets_spreadsheet_id = ?;
+configurable string & readonly sheets_worksheet_name = ?;
 
 sheets:SpreadsheetConfiguration spreadsheetConfig = {
-    oauthClientConfig: {
-        clientId: sheets_clientId,
-        clientSecret: sheets_clientSecret,
-        refreshUrl: sheets:REFRESH_URL,
-        refreshToken: sheets_refreshToken
-    }
+    oauthClientConfig: directTokenConfig
 };
 
 // Initialize the Spreadsheet Client
-sheets:Client spreadsheetClient = checkpanic new (spreadsheetConfig);
+sheets:Client spreadsheetClient = check new (spreadsheetConfig);
 
 // Salesforce configuration parameters
-configurable string sf_username = ?;
-configurable string sf_password = ?;
-configurable string sf_push_topic = ?;
+configurable sfdc:ListenerConfiguration & readonly listenerConfig = ?;
+configurable string & readonly sf_push_topic = ?;
 
-sfdc:ListenerConfiguration listenerConfig = {
-    username: sf_username,
-    password: sf_password
-};
-
-// Initialize the Salesforce listener
+// Initialize the Salesforce Listener
 listener sfdc:Listener sfdcEventListener = new (listenerConfig);
 
 @sfdc:ServiceConfig {

@@ -4,28 +4,18 @@ import ballerinax/sfdc;
 import ballerinax/twilio;
 
 // Twilio configuration parameters
-configurable string account_sid = ?;
-configurable string auth_token = ?;
-configurable string from_mobile = ?;
-configurable string to_mobile = ?;
+configurable twilio:TwilioConfiguration & readonly twilioConfig = ?;
+configurable string & readonly from_mobile = ?;
+configurable string & readonly to_mobile = ?;
 
-twilio:TwilioConfiguration twilioConfig = {
-    accountSId: account_sid,
-    authToken: auth_token
-};
-
-twilio:Client twilioClient = new(twilioConfig);
+// Initialize the Twilio Client
+twilio:Client twilioClient = new (twilioConfig);
 
 // Salesforce configuration parameters
-configurable string sf_username = ?;
-configurable string sf_password = ?;
-configurable string sf_push_topic = ?;
+configurable sfdc:ListenerConfiguration & readonly listenerConfig = ?;
+configurable string & readonly sf_push_topic = ?;
 
-sfdc:ListenerConfiguration listenerConfig = {
-    username: sf_username,
-    password: sf_password
-};
-
+// Initialize the Salesforce Listener
 listener sfdc:Listener sfdcEventListener = new (listenerConfig);
 
 @sfdc:ServiceConfig {
