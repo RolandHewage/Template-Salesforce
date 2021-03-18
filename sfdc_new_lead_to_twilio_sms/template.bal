@@ -4,21 +4,21 @@ import ballerinax/twilio;
 
 // Twilio configuration parameters
 configurable twilio:TwilioConfiguration & readonly twilioConfig = ?;
-configurable string & readonly from_mobile = ?;
-configurable string & readonly to_mobile = ?;
+configurable string & readonly twFromMobile = ?;
+configurable string & readonly twToMobile = ?;
 
 // Initialize the Twilio Client
 twilio:Client twilioClient = new (twilioConfig);
 
 // Salesforce configuration parameters
 configurable sfdc:ListenerConfiguration & readonly listenerConfig = ?;
-configurable string & readonly sf_push_topic = ?;
+configurable string & readonly sfPushTopic = ?;
 
 // Initialize the Salesforce Listener
 listener sfdc:Listener sfdcEventListener = new (listenerConfig);
 
 @sfdc:ServiceConfig {
-    topic: TOPIC_PREFIX + sf_push_topic
+    topic: TOPIC_PREFIX + sfPushTopic
 }
 service on sfdcEventListener {
     remote function onEvent(json lead) returns error? {
@@ -42,5 +42,5 @@ function sendMessageForNewLead(json lead) returns error? {
         }
     }
 
-    twilio:SmsResponse result = check twilioClient->sendSms(from_mobile, to_mobile, message);
+    twilio:SmsResponse result = check twilioClient->sendSms(twFromMobile, twToMobile, message);
 }
